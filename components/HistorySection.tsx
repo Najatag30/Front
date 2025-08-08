@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { FileText, XCircle, Calendar, Clock, FileCheck, X, Eye } from "lucide-react"
+import { ExportUtils } from "@/components/export-utils"
 import type { OperationHistory } from "@/types"
 
 interface HistorySectionProps {
@@ -147,9 +148,9 @@ export function HistorySection({
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gradient-to-r from-amber-100 to-orange-100">
+                    <TableHead className="font-bold text-gray-800">Id</TableHead>
                       <TableHead className="font-bold text-gray-800">Type</TableHead>
                       <TableHead className="font-bold text-gray-800">Source → Cible</TableHead>
-                      <TableHead className="font-bold text-gray-800">BIC</TableHead>
                       <TableHead className="font-bold text-gray-800">Timestamp</TableHead>
                       <TableHead className="font-bold text-gray-800">Statut</TableHead>
                       <TableHead className="font-bold text-gray-800">Erreur</TableHead>
@@ -163,7 +164,7 @@ export function HistorySection({
                         className="hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 transition-all duration-300 animate-slide-in"
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
-                        <TableCell className="font-medium">{log.operationType}</TableCell>
+                        <TableCell className="font-medium">{log.id}</TableCell>
                         <TableCell className="font-mono text-sm">
                           {log.sourceType} → {log.targetType}
                         </TableCell>
@@ -197,15 +198,19 @@ export function HistorySection({
                           )}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onViewDetails(log)}
-                            className="text-[#F55B3B] border-[#F55B3B] hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-100 hover:shadow-md transform hover:scale-105 transition-all duration-300"
-                          >
-                            <Eye className="w-4 h-4 mr-1" />
-                            Détails
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onViewDetails(log)}
+                              className="text-[#F55B3B] border-[#F55B3B] hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-100 hover:shadow-md transform hover:scale-105 transition-all duration-300"
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              Détails
+                            </Button>
+                            {/* Export button for all history */}
+                            <ExportUtils data={[log]} filename={`operation-${log.id}`} />
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

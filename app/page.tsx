@@ -1,31 +1,34 @@
 "use client"
 
 import { useState } from "react"
-import { Sidebar } from "@/components/Sidebar"
 import { Header } from "@/components/Header"
+import { Sidebar } from "@/components/Sidebar"
 import { Dashboard } from "@/components/Dashboard"
 import { ValidationSection } from "@/components/ValidationSection"
 import { ValidationHistorySection } from "@/components/ValidationHistorySection"
 import { TransformationSection } from "@/components/TransformationSection"
 import { TransformationHistorySection } from "@/components/TransformationHistorySection"
+import { SimulationValidationSection } from "@/components/SimulationValidation"
+import { SimulationTransformationSection } from "@/components/SimulationTransformation"
+import { InjectionSection } from "@/components/InjectionSection"
 import { HistorySection } from "@/components/HistorySection"
 import { OperationModal } from "@/components/OperationModal"
 import { useValidation } from "@/hooks/useValidation"
 import { useTransformation } from "@/hooks/useTransformation"
+import { useSimulation } from "@/hooks/useSimulation"
 import { usePagedHistory } from "@/hooks/usePagedHistory"
 import type { OperationHistory, MenuItem } from "@/types"
-import { LayoutDashboard, CheckCircle2, Repeat2, Clock } from "lucide-react";
-
+import { LayoutDashboard, CheckCircle2, Repeat2, Clock, Play, Upload } from "lucide-react"
 // Fonction utilitaire robuste pour transformer date/heure en ISO
 function toUTCISOString(dateStr: string, timeStr: string): string {
-  if (!dateStr || !timeStr) throw new Error("Date or Time missing");
-  if (timeStr.length === 5) timeStr += ":00";
-  const isoString = `${dateStr}T${timeStr}`;
-  const date = new Date(isoString);
+  if (!dateStr || !timeStr) throw new Error("Date or Time missing")
+  if (timeStr.length === 5) timeStr += ":00"
+  const isoString = `${dateStr}T${timeStr}`
+  const date = new Date(isoString)
   if (isNaN(date.getTime())) {
-    throw new Error(`Invalid date: ${isoString}`);
+    throw new Error(`Invalid date: ${isoString}`)
   }
-  return date.toISOString();
+  return date.toISOString()
 }
 
 export default function BankingInterface() {
@@ -70,80 +73,108 @@ export default function BankingInterface() {
     handleTransformation,
   } = useTransformation()
 
+  // NOUVEAU: Hook pour les simulations
+  const {
+    simulationValidationLoading,
+    simulationValidationResult,
+    simulationTransformationLoading,
+    simulationTransformationResult,
+    simulationTransformationError,
+    handleSimulationValidation,
+    handleSimulationTransformation,
+  } = useSimulation()
+
   // Un hook d'historique par section !
   const historyGlobal = usePagedHistory("global", 10, filterFromDateGlobal, filterToDateGlobal)
   const historyValidation = usePagedHistory("validation", 10, filterFromDateValidation, filterToDateValidation)
-  const historyTransformation = usePagedHistory("transformation", 10, filterFromDateTransformation, filterToDateTransformation)
+  const historyTransformation = usePagedHistory(
+    "transformation",
+    10,
+    filterFromDateTransformation,
+    filterToDateTransformation,
+  )
 
   // Handlers pour CHAQUE filtre
 
   // --- GLOBAL ---
   const handleFilterGlobal = () => {
     if (filterDateGlobal && filterFromTimeGlobal && filterToTimeGlobal) {
-      let from = toUTCISOString(filterDateGlobal, filterFromTimeGlobal);
-      let to;
+      const from = toUTCISOString(filterDateGlobal, filterFromTimeGlobal)
+      let to
       if (filterToTimeGlobal.length === 5) {
-        to = `${filterDateGlobal}T${filterToTimeGlobal}:59.999Z`;
+        to = `${filterDateGlobal}T${filterToTimeGlobal}:59.999Z`
       } else if (filterToTimeGlobal.length === 8) {
-        to = `${filterDateGlobal}T${filterToTimeGlobal}.999Z`;
+        to = `${filterDateGlobal}T${filterToTimeGlobal}.999Z`
       } else {
-        to = `${filterDateGlobal}T23:59:59.999Z`;
+        to = `${filterDateGlobal}T23:59:59.999Z`
       }
-      setFilterFromDateGlobal(from);
-      setFilterToDateGlobal(to);
-      historyGlobal.setPage(0);
+      setFilterFromDateGlobal(from)
+      setFilterToDateGlobal(to)
+      historyGlobal.setPage(0)
     }
   }
   const handleResetGlobal = () => {
-    setFilterDateGlobal(""); setFilterFromTimeGlobal(""); setFilterToTimeGlobal("");
-    setFilterFromDateGlobal(""); setFilterToDateGlobal(""); historyGlobal.setPage(0);
+    setFilterDateGlobal("")
+    setFilterFromTimeGlobal("")
+    setFilterToTimeGlobal("")
+    setFilterFromDateGlobal("")
+    setFilterToDateGlobal("")
+    historyGlobal.setPage(0)
   }
 
   // --- VALIDATION ---
   const handleFilterValidation = () => {
     if (filterDateValidation && filterFromTimeValidation && filterToTimeValidation) {
-      let from = toUTCISOString(filterDateValidation, filterFromTimeValidation);
-      let to;
+      const from = toUTCISOString(filterDateValidation, filterFromTimeValidation)
+      let to
       if (filterToTimeValidation.length === 5) {
-        to = `${filterDateValidation}T${filterToTimeValidation}:59.999Z`;
+        to = `${filterDateValidation}T${filterToTimeValidation}:59.999Z`
       } else if (filterToTimeValidation.length === 8) {
-        to = `${filterDateValidation}T${filterToTimeValidation}.999Z`;
+        to = `${filterDateValidation}T${filterToTimeValidation}.999Z`
       } else {
-        to = `${filterDateValidation}T23:59:59.999Z`;
+        to = `${filterDateValidation}T23:59:59.999Z`
       }
-      setFilterFromDateValidation(from);
-      setFilterToDateValidation(to);
-      historyValidation.setPage(0);
+      setFilterFromDateValidation(from)
+      setFilterToDateValidation(to)
+      historyValidation.setPage(0)
     }
   }
   const handleResetValidation = () => {
-    setFilterDateValidation(""); setFilterFromTimeValidation(""); setFilterToTimeValidation("");
-    setFilterFromDateValidation(""); setFilterToDateValidation(""); historyValidation.setPage(0);
+    setFilterDateValidation("")
+    setFilterFromTimeValidation("")
+    setFilterToTimeValidation("")
+    setFilterFromDateValidation("")
+    setFilterToDateValidation("")
+    historyValidation.setPage(0)
   }
 
   // --- TRANSFORMATION ---
   const handleFilterTransformation = () => {
     if (filterDateTransformation && filterFromTimeTransformation && filterToTimeTransformation) {
-      let from = toUTCISOString(filterDateTransformation, filterFromTimeTransformation);
-      let to;
+      const from = toUTCISOString(filterDateTransformation, filterFromTimeTransformation)
+      let to
       if (filterToTimeTransformation.length === 5) {
-        to = `${filterDateTransformation}T${filterToTimeTransformation}:59.999Z`;
+        to = `${filterDateTransformation}T${filterToTimeTransformation}:59.999Z`
       } else if (filterToTimeTransformation.length === 8) {
-        to = `${filterDateTransformation}T${filterToTimeTransformation}.999Z`;
+        to = `${filterDateTransformation}T${filterToTimeTransformation}.999Z`
       } else {
-        to = `${filterDateTransformation}T23:59:59.999Z`;
+        to = `${filterDateTransformation}T23:59:59.999Z`
       }
-      setFilterFromDateTransformation(from);
-      setFilterToDateTransformation(to);
-      historyTransformation.setPage(0);
+      setFilterFromDateTransformation(from)
+      setFilterToDateTransformation(to)
+      historyTransformation.setPage(0)
     }
   }
   const handleResetTransformation = () => {
-    setFilterDateTransformation(""); setFilterFromTimeTransformation(""); setFilterToTimeTransformation("");
-    setFilterFromDateTransformation(""); setFilterToDateTransformation(""); historyTransformation.setPage(0);
+    setFilterDateTransformation("")
+    setFilterFromTimeTransformation("")
+    setFilterToTimeTransformation("")
+    setFilterFromDateTransformation("")
+    setFilterToDateTransformation("")
+    historyTransformation.setPage(0)
   }
 
-  // Sidebar et menu
+  // Sidebar et menu AVEC LA NOUVELLE SECTION INJECTION
   const menuItems: MenuItem[] = [
     {
       id: "dashboard",
@@ -169,30 +200,62 @@ export default function BankingInterface() {
       ],
     },
     {
+      id: "simulation",
+      label: "Simulation",
+      icon: Play,
+      subItems: [
+        { id: "simulation-validation", label: "Simulation Validation", icon: CheckCircle2 },
+        { id: "simulation-transformation", label: "Simulation Transformation", icon: Repeat2 },
+      ],
+    },
+    {
+      id: "injection",
+      label: "Injection",
+      icon: Upload,
+    },
+    {
       id: "logs",
       label: "Historique global",
       icon: Clock,
     },
-  ];
-  
+  ]
+
   const handleViewDetails = (log: OperationHistory) => {
-    setSelectedLog(log);
-    setIsModalOpen(true);
-  };
+    setSelectedLog(log)
+    setIsModalOpen(true)
+  }
 
   const onValidate = () => {
-    handleValidation(sourceType, targetType, xmlContent);
-    historyValidation.reload();
-    historyGlobal.reload();
-  };
+    handleValidation(sourceType, targetType, xmlContent)
+    historyValidation.reload()
+    historyGlobal.reload()
+  }
+
   const onTransform = async () => {
-    await handleTransformation();
-    historyTransformation.reload();
-    historyGlobal.reload();
-  };
+    await handleTransformation()
+    historyTransformation.reload()
+    historyGlobal.reload()
+  }
+
+  // NOUVEAUX handlers pour les simulations (ne rechargent PAS l'historique)
+  const onSimulateValidation = () => {
+    handleSimulationValidation(sourceType, targetType, xmlContent)
+    // Pas de reload d'historique !
+  }
+
+  const onSimulateTransformation = async () => {
+    await handleSimulationTransformation(painXmlInput)
+    // Pas de reload d'historique !
+  }
+
+  // Handler pour l'injection réussie
+  const onInjectionSuccess = () => {
+    // Optionnel: Rafraîchir l'historique ou rediriger
+    historyGlobal.reload()
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50 to-orange-50 flex">
+    <div className="min-h-screen bg-gray-100 flex">
       <Sidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
@@ -254,7 +317,7 @@ export default function BankingInterface() {
               mt101Output={mt101Output}
               transformationLoading={transformationLoading}
               transformationError={transformationError}
-              onTransform={handleTransformation}
+              onTransform={onTransform}
             />
           )}
 
@@ -280,6 +343,35 @@ export default function BankingInterface() {
               setSize={historyTransformation.setSize}
             />
           )}
+
+          {/* SECTIONS SIMULATION */}
+          {activeSection === "simulation-validation" && (
+            <SimulationValidationSection
+              sourceType={sourceType}
+              setSourceType={setSourceType}
+              targetType={targetType}
+              setTargetType={setTargetType}
+              xmlContent={xmlContent}
+              setXmlContent={setXmlContent}
+              simulationLoading={simulationValidationLoading}
+              simulationResult={simulationValidationResult}
+              onSimulate={onSimulateValidation}
+            />
+          )}
+
+          {activeSection === "simulation-transformation" && (
+            <SimulationTransformationSection
+              painXmlInput={painXmlInput}
+              setPainXmlInput={setPainXmlInput}
+              simulationOutput={simulationTransformationResult}
+              simulationLoading={simulationTransformationLoading}
+              simulationError={simulationTransformationError}
+              onSimulate={onSimulateTransformation}
+            />
+          )}
+
+          {/* NOUVELLE SECTION INJECTION */}
+          {activeSection === "injection" && <InjectionSection onSuccess={onInjectionSuccess} />}
 
           {/* Historique global */}
           {activeSection === "logs" && (

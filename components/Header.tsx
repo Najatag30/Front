@@ -1,6 +1,6 @@
 "use client"
 
-import { BarChart3, BadgeCheck, Repeat2, History } from "lucide-react"
+import { BarChart3, CheckCircle2, Repeat2, History, Play, Upload } from "lucide-react" // Ajout de Upload
 import type { MenuItem } from "@/types"
 
 interface HeaderProps {
@@ -8,7 +8,7 @@ interface HeaderProps {
   menuItems: MenuItem[]
 }
 
-// Gardez vos fonctions existantes (ne changez rien ici)
+// Fonction mise à jour avec les nouvelles sections
 function getSubtitle(activeSection: string) {
   switch (activeSection) {
     case "dashboard":
@@ -23,6 +23,12 @@ function getSubtitle(activeSection: string) {
       return "Effectuez vos transformations de fichiers ici."
     case "transformation-history":
       return "Historique des transformations effectuées."
+    case "simulation-validation":
+      return "Testez vos validations sans enregistrer dans l'historique."
+    case "simulation-transformation":
+      return "Testez vos transformations sans enregistrer dans l'historique."
+    case "injection":
+      return "Envoyez des fichiers XML vers Kafka."
     case "logs":
       return "Toutes les opérations globales."
     default:
@@ -30,6 +36,7 @@ function getSubtitle(activeSection: string) {
   }
 }
 
+// Fonction mise à jour avec les nouvelles sections
 function getIcon(activeSection: string) {
   switch (activeSection) {
     case "dashboard":
@@ -37,11 +44,16 @@ function getIcon(activeSection: string) {
     case "validation":
     case "validation-form":
     case "validation-history":
-      return <BadgeCheck className="w-6 h-6 text-white" />
+      return <CheckCircle2 className="w-6 h-6 text-white" />
     case "transformation":
     case "transformation-form":
     case "transformation-history":
       return <Repeat2 className="w-6 h-6 text-white" />
+    case "simulation-validation":
+    case "simulation-transformation":
+      return <Play className="w-6 h-6 text-white" />
+    case "injection":
+      return <Upload className="w-6 h-6 text-white" />
     case "logs":
       return <History className="w-6 h-6 text-white" />
     default:
@@ -49,7 +61,7 @@ function getIcon(activeSection: string) {
   }
 }
 
-// REMPLACEZ SEULEMENT cette fonction Header par l'une des options ci-dessous
+// Votre fonction Header reste identique
 export function Header({ activeSection, menuItems }: HeaderProps) {
   // Gardez cette fonction (ne changez rien)
   const getActiveTitle = () => {
@@ -90,62 +102,4 @@ export function Header({ activeSection, menuItems }: HeaderProps) {
       </div>
     </header>
   )
-
-  // OPTION 2: Style Minimaliste (décommentez si vous préférez)
-  /*
-  return (
-    <header className="bg-white px-6 py-6 mx-6 rounded-xl shadow-sm border border-gray-100">
-      <div className="flex items-center space-x-4">
-        <div className="w-1 h-12 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></div>
-        <div>
-          <h1 className="text-2xl font-light text-gray-900 tracking-wide">{getActiveTitle()}</h1>
-          <p className="text-gray-500 text-sm mt-1 font-medium">{getSubtitle(activeSection)}</p>
-        </div>
-      </div>
-    </header>
-  )
-  */
-
-  // OPTION 3: Style Banking (décommentez si vous préférez)
-  /*
-  return (
-    <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 mx-6 rounded-lg">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg flex items-center justify-center shadow-md">
-              {getIcon(activeSection)}
-            </div>
-            <div className="border-l border-gray-300 pl-3">
-              <h1 className="text-xl font-semibold text-gray-900 tracking-tight">{getActiveTitle()}</h1>
-              <p className="text-xs text-gray-600 uppercase tracking-wide font-medium">{getSubtitle(activeSection)}</p>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="text-right">
-            <div className="text-xs text-gray-500 uppercase tracking-wide">Session Active</div>
-            <div className="text-sm font-medium text-gray-900">{new Date().toLocaleDateString("fr-FR")}</div>
-          </div>
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-        </div>
-      </div>
-    </header>
-  )
-  */
-
-  // OPTION 4: Style Clean (décommentez si vous préférez)
-  /*
-  return (
-    <header className="bg-white px-6 py-5 mx-6 rounded-lg shadow-sm border-l-4 border-orange-500">
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-orange-50 rounded-lg">{getIcon(activeSection)}</div>
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{getActiveTitle()}</h1>
-          <p className="text-sm text-gray-600 mt-1">{getSubtitle(activeSection)}</p>
-        </div>
-      </div>
-    </header>
-  )
-  */
 }

@@ -18,16 +18,18 @@ export function useValidation() {
     setValidationResult(null)
 
     try {
-      const params = new URLSearchParams()
-      params.append("sourceType", sourceType)
-      params.append("targetType", targetType)
-      params.append("xml", xmlContent)
+    const params = new URLSearchParams()
+const enumSourceType = sourceType.toUpperCase().replaceAll('.', '_');
+params.append("sourceType", enumSourceType)
+params.append("targetType", targetType)
+params.append("xml", xmlContent)
 
-      const response = await fetch(`${API_URL}/initiate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params,
-      })
+const response = await fetch(`${API_URL}/validate`, {
+  method: "POST",
+  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  body: params.toString(),
+})
+
 
       const result = await response.text()
       setValidationResult({

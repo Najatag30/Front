@@ -1,3 +1,4 @@
+import type React from "react"
 export interface OperationHistory {
   id: string
   operationType: "validation" | "transformation"
@@ -11,7 +12,7 @@ export interface OperationHistory {
   duration?: number
   details?: string
   userId?: string
-  bic?: string // ✅ Ajoute ça
+  bic?: string 
 }
 
 
